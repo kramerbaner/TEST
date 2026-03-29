@@ -1,0 +1,5 @@
+{
+  "env": {
+    "CLAUDE_CODE_GIT_BASH_PATH": "/usr/bin/bash"
+  }
+}
