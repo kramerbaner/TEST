@@ -1,0 +1,35 @@
+{
+  "name": "video-downloader",
+  "version": "1.0.0",
+  "description": "Desktopowa aplikacja do pobierania video z YouTube, Facebook i Twittera",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --mac",
+    "build:dmg": "electron-builder --mac dmg",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.example.videodownloader",
+    "productName": "Video Downloader",
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] }
+      ],
+      "icon": "build/icon.icns"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "package.json"
+    ]
+  }
+}
