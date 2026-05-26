@@ -1,8 +1,21 @@
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
-const { spawn, execFile } = require('child_process');
+const { spawn, execFile, execFileSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
+
+process.env.PATH = [
+  '/opt/homebrew/bin',
+  '/opt/homebrew/sbin',
+  '/usr/local/bin',
+  '/usr/local/sbin',
+  '/usr/bin',
+  '/bin',
+  '/usr/sbin',
+  '/sbin',
+  path.join(os.homedir(), '.local', 'bin'),
+  process.env.PATH || ''
+].filter(Boolean).join(':');
 
 let mainWindow;
 
@@ -38,40 +51,69 @@ app.on('window-all-closed', () => {
 function findBinary(name) {
   const candidates = [
     `/opt/homebrew/bin/${name}`,
+    `/opt/homebrew/sbin/${name}`,
     `/usr/local/bin/${name}`,
+    `/usr/local/sbin/${name}`,
     `/usr/bin/${name}`,
+    `/bin/${name}`,
     path.join(os.homedir(), '.local', 'bin', name)
   ];
   for (const c of candidates) {
-    if (fs.existsSync(c)) return c;
+    try { if (fs.existsSync(c)) return c; } catch (e) {}
+  }
+  const shells = ['/bin/zsh', '/bin/bash'];
+  for (const sh of shells) {
+    try {
+      const out = execFileSync(sh, ['-ilc', `command -v ${name} 2>/dev/null`], {
+        encoding: 'utf8',
+        timeout: 5000
+      }).trim();
+      const found = out.split('\n').pop().trim();
+      if (found && fs.existsSync(found)) return found;
+    } catch (e) {}
   }
   return name;
 }
 
-const YT_DLP = findBinary('yt-dlp');
-const FFMPEG = findBinary('ffmpeg');
+let YT_DLP = findBinary('yt-dlp');
+let FFMPEG = findBinary('ffmpeg');
+console.log('[deps] yt-dlp ->', YT_DLP);
+console.log('[deps] ffmpeg ->', FFMPEG);
 
 ipcMain.handle('check-dependencies', async () => {
-  const result = { ytdlp: false, ffmpeg: false, ytdlpVersion: null };
+  YT_DLP = findBinary('yt-dlp');
+  FFMPEG = findBinary('ffmpeg');
+  const result = {
+    ytdlp: false,
+    ffmpeg: false,
+    ytdlpVersion: null,
+    ytdlpPath: YT_DLP,
+    ffmpegPath: FFMPEG
+  };
   try {
     await new Promise((resolve, reject) => {
-      execFile(YT_DLP, ['--version'], (err, stdout) => {
+      execFile(YT_DLP, ['--version'], { timeout: 8000 }, (err, stdout) => {
         if (err) return reject(err);
         result.ytdlp = true;
         result.ytdlpVersion = stdout.trim();
         resolve();
       });
     });
-  } catch (e) {}
+  } catch (e) {
+    result.ytdlpError = e.message;
+  }
   try {
     await new Promise((resolve, reject) => {
-      execFile(FFMPEG, ['-version'], (err) => {
+      execFile(FFMPEG, ['-version'], { timeout: 8000 }, (err) => {
         if (err) return reject(err);
         result.ffmpeg = true;
         resolve();
       });
     });
-  } catch (e) {}
+  } catch (e) {
+    result.ffmpegError = e.message;
+  }
+  console.log('[deps] check result:', result);
   return result;
 });
 

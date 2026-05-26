@@ -10,9 +10,9 @@ async function init() {
   const deps = await window.api.checkDependencies();
   if (!deps.ytdlp || !deps.ffmpeg) {
     const missing = [];
-    if (!deps.ytdlp) missing.push('yt-dlp');
-    if (!deps.ffmpeg) missing.push('ffmpeg');
-    $('deps-detail').textContent = 'Brakuje: ' + missing.join(', ');
+    if (!deps.ytdlp) missing.push(`yt-dlp (próbowano: ${deps.ytdlpPath})`);
+    if (!deps.ffmpeg) missing.push(`ffmpeg (próbowano: ${deps.ffmpegPath})`);
+    $('deps-detail').innerHTML = 'Brakuje:<br>' + missing.join('<br>');
     $('deps-warning').classList.remove('hidden');
     $('download').disabled = true;
   }
