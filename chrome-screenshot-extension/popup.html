@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Zrzut Strony</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <img src="icons/icon32.png" alt="" />
+      <h1>Zrzut Strony</h1>
+    </header>
+
+    <div id="warning" class="warning" hidden></div>
+
+    <div class="actions">
+      <button id="btn-full-page" class="btn btn-primary">
+        <span class="btn-title">Cała strona</span>
+        <span class="btn-desc">Przewija i skleja jak GoFullPage</span>
+      </button>
+      <button id="btn-selection" class="btn">
+        <span class="btn-title">Zaznacz fragment</span>
+        <span class="btn-desc">Przeciągnij, aby wybrać obszar</span>
+      </button>
+      <button id="btn-visible" class="btn">
+        <span class="btn-title">Widoczny obszar</span>
+        <span class="btn-desc">Zrzut samego okna przeglądarki</span>
+      </button>
+    </div>
+
+    <button id="btn-last" class="link-btn" hidden>Otwórz ostatni zrzut</button>
+
+    <footer>
+      <span>Skróty: <kbd>Ctrl+Shift+S</kbd> zaznaczenie, <kbd>Ctrl+Shift+F</kbd> cała strona</span>
+    </footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

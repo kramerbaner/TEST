@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Zrzut Strony — Full Page & Selection Screenshot",
+  "description": "Rób zrzuty ekranu widocznego obszaru, całej strony (przewijanie i sklejanie jak GoFullPage) lub wybranego fragmentu strony.",
+  "version": "1.0.0",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "Zrzut Strony"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["activeTab", "scripting", "downloads", "tabs", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "commands": {
+    "capture-selection": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Zaznacz fragment strony do zrzutu"
+    },
+    "capture-full-page": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+F",
+        "mac": "Command+Shift+F"
+      },
+      "description": "Zrzut całej strony"
+    }
+  }
+}
