@@ -3,6 +3,9 @@ const btnFullPage = document.getElementById('btn-full-page');
 const btnSelection = document.getElementById('btn-selection');
 const btnVisible = document.getElementById('btn-visible');
 const btnLast = document.getElementById('btn-last');
+const versionEl = document.getElementById('version');
+
+versionEl.textContent = `Wersja ${chrome.runtime.getManifest().version}`;
 
 function sendMessage(type) {
   return new Promise((resolve) => {

@@ -5,7 +5,7 @@ Wtyczka do Chrome robiąca zrzuty ekranu stron www — działa jak **GoFullPage*
 - **Zaznacz fragment** — przeciągnięciem myszy wybierasz dokładny obszar strony do zrzutu.
 - **Widoczny obszar** — szybki zrzut tego, co aktualnie widać w oknie przeglądarki.
 
-Po wykonaniu zrzutu otwiera się nowa karta z podglądem, przyciskiem **Pobierz PNG** oraz **Kopiuj do schowka**.
+Po wykonaniu zrzutu otwiera się nowa karta z podglądem, opcją **Przytnij** (zaznacz obszar na już zrobionym zrzucie i przytnij do niego), przyciskiem **Pobierz PNG** oraz **Kopiuj do schowka**.
 
 ## Instalacja (tryb dewelopera / rozszerzenie rozpakowane)
 
@@ -19,8 +19,13 @@ Po wykonaniu zrzutu otwiera się nowa karta z podglądem, przyciskiem **Pobierz 
 
 - Kliknij ikonę wtyczki i wybierz jedną z trzech opcji.
 - Skróty klawiszowe: `Ctrl+Shift+S` (zaznacz fragment), `Ctrl+Shift+F` (cała strona) — można je zmienić w `chrome://extensions/shortcuts`.
-- Podczas zaznaczania fragmentu: przeciągnij myszą, aby narysować obszar; `Esc` anuluje.
+- Podczas zaznaczania fragmentu: przeciągnij myszą, aby narysować obszar; strona swobodnie się przewija (kółkiem, klawiaturą), a trzymanie kursora blisko górnej/dolnej krawędzi okna podczas przeciągania auto-przewija stronę, więc można zaznaczyć obszar większy niż jeden ekran. `Esc` anuluje.
 - Podczas zrzutu całej strony widoczny jest pasek postępu; elementy `position: fixed`/`sticky` (np. sticky nagłówki) są tymczasowo ukrywane, żeby nie powielały się w sklejonym obrazie.
+- Na karcie wyniku przycisk **Przytnij** pozwala domalować dokładniejsze zaznaczenie na już zrobionym zrzucie (np. wyciąć fragment z pełnej strony) — **Przywróć oryginał** cofa przycięcie.
+
+### Aktualizacja wtyczki
+
+Po każdej zmianie kodu: wejdź na `chrome://extensions` i kliknij ikonę odświeżania ⟳ przy wtyczce. Numer wersji widoczny w stopce okienka wtyczki (np. „Wersja 1.2.0”) pozwala sprawdzić, czy przeglądarka faktycznie używa najnowszego kodu.
 
 ## Struktura projektu
 

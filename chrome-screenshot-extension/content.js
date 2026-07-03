@@ -1,8 +1,11 @@
-if (!window.__zrzutStronyLoaded) {
-  window.__zrzutStronyLoaded = true;
-
-  (function () {
-    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// Re-injected on every capture request (see background.js's ensureContentScript),
+// including after the extension itself has been reloaded/updated while a tab
+// stayed open. A plain "run once" guard would leave the OLD listener (with
+// stale behavior) permanently active in that case, so instead we always
+// replace the previously registered listener with a fresh one bound to
+// whatever this copy of the script does.
+(function () {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
     function loadImage(src) {
       return new Promise((resolve, reject) => {
@@ -230,6 +233,7 @@ if (!window.__zrzutStronyLoaded) {
       overlay.appendChild(box);
 
       document.documentElement.appendChild(overlay);
+      window.__zrzutStronyActiveOverlay = overlay;
 
       const EDGE_MARGIN = 56; // px from top/bottom edge that triggers auto-scroll
       const MAX_SPEED = 22; // px per animation frame at the very edge
@@ -245,6 +249,8 @@ if (!window.__zrzutStronyLoaded) {
         if (autoScrollHandle) cancelAnimationFrame(autoScrollHandle);
         overlay.remove();
         document.removeEventListener('keydown', onKeyDown, true);
+        window.removeEventListener('scroll', onWindowScroll);
+        if (window.__zrzutStronyActiveOverlay === overlay) window.__zrzutStronyActiveOverlay = null;
       }
 
       function onKeyDown(e) {
@@ -296,13 +302,10 @@ if (!window.__zrzutStronyLoaded) {
       // Scrolling the page (wheel, keyboard, etc.) while a selection is in
       // progress is never blocked — this listener only keeps the box in
       // sync with the new scroll position.
-      window.addEventListener(
-        'scroll',
-        () => {
-          if (dragging) renderBox();
-        },
-        { passive: true }
-      );
+      function onWindowScroll() {
+        if (dragging) renderBox();
+      }
+      window.addEventListener('scroll', onWindowScroll, { passive: true });
 
       overlay.addEventListener('mousedown', (e) => {
         if (e.button !== 0) return;
@@ -356,7 +359,23 @@ if (!window.__zrzutStronyLoaded) {
       document.addEventListener('keydown', onKeyDown, true);
     }
 
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (window.__zrzutStronyMessageListener) {
+      try {
+        chrome.runtime.onMessage.removeListener(window.__zrzutStronyMessageListener);
+      } catch (e) {
+        /* listener from a previous injection may already be gone */
+      }
+    }
+    if (window.__zrzutStronyActiveOverlay) {
+      try {
+        window.__zrzutStronyActiveOverlay.remove();
+      } catch (e) {
+        /* already removed */
+      }
+      window.__zrzutStronyActiveOverlay = null;
+    }
+
+    const messageListener = (message, sender, sendResponse) => {
       if (message.type === 'start-full-page-capture') {
         captureFullPage().catch((err) => {
           hideToast();
@@ -368,6 +387,7 @@ if (!window.__zrzutStronyLoaded) {
         sendResponse({ ok: true });
       }
       return false;
-    });
+    };
+    window.__zrzutStronyMessageListener = messageListener;
+    chrome.runtime.onMessage.addListener(messageListener);
   })();
-}
