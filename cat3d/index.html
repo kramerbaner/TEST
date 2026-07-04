@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Kot 3D</title>
+	<link rel="stylesheet" href="style.css">
+	<script type="importmap">
+	{
+		"imports": {
+			"three": "./vendor/three.module.js"
+		}
+	}
+	</script>
+</head>
+<body>
+	<canvas id="scene"></canvas>
+
+	<div id="ui">
+		<div id="status">odpoczywa</div>
+		<div id="help">
+			<strong>WASD / strzałki</strong> — ruch &nbsp;·&nbsp;
+			<strong>Shift</strong> — bieg &nbsp;·&nbsp;
+			<strong>Spacja</strong> — skok &nbsp;·&nbsp;
+			<strong>przeciągnij myszką</strong> — obrót kamery &nbsp;·&nbsp;
+			<strong>scroll</strong> — zoom
+			<br>Kiedy nic nie robisz, kot sam się czymś zajmie 🐈
+		</div>
+	</div>
+
+	<script type="module" src="src/main.js"></script>
+</body>
+</html>
