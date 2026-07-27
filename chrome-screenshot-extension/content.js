@@ -233,6 +233,7 @@
       overlay.appendChild(box);
 
       document.documentElement.appendChild(overlay);
+      document.documentElement.classList.add('zrzut-selecting');
       window.__zrzutStronyActiveOverlay = overlay;
 
       const EDGE_MARGIN = 56; // px from top/bottom edge that triggers auto-scroll
@@ -248,8 +249,16 @@
       function cleanup() {
         if (autoScrollHandle) cancelAnimationFrame(autoScrollHandle);
         overlay.remove();
+        document.documentElement.classList.remove('zrzut-selecting');
         document.removeEventListener('keydown', onKeyDown, true);
+        document.removeEventListener('mousedown', onMouseDown, true);
+        document.removeEventListener('mousemove', onMouseMove, true);
+        document.removeEventListener('mouseup', onMouseUp, true);
         window.removeEventListener('scroll', onWindowScroll);
+        // The browser fires 'click' as a separate event right after this
+        // mouseup (e.g. a link's navigation), so the click-blocker has to
+        // outlive the rest of this cleanup by one tick to still catch it.
+        setTimeout(() => document.removeEventListener('click', onClick, true), 0);
         if (window.__zrzutStronyActiveOverlay === overlay) window.__zrzutStronyActiveOverlay = null;
       }
 
@@ -307,7 +316,12 @@
       }
       window.addEventListener('scroll', onWindowScroll, { passive: true });
 
-      overlay.addEventListener('mousedown', (e) => {
+      // Listeners live on `document` (capture phase) rather than on the
+      // overlay itself, which stays pointer-events:none. That guarantees
+      // wheel/trackpad scrolling — and anything else about the underlying
+      // page — is never affected by the overlay's presence; only the
+      // drag-to-select gesture is intercepted, and only while it's happening.
+      function onMouseDown(e) {
         if (e.button !== 0) return;
         dragging = true;
         lastClientX = e.clientX;
@@ -318,18 +332,21 @@
         renderBox();
         autoScrollHandle = requestAnimationFrame(autoScrollTick);
         e.preventDefault();
-      });
+      }
 
-      overlay.addEventListener('mousemove', (e) => {
+      function onMouseMove(e) {
         if (!dragging) return;
         lastClientX = e.clientX;
         lastClientY = e.clientY;
         renderBox();
-      });
+        e.preventDefault();
+      }
 
-      overlay.addEventListener('mouseup', async (e) => {
+      async function onMouseUp(e) {
         if (!dragging) return;
         dragging = false;
+        e.preventDefault();
+        e.stopPropagation();
         if (autoScrollHandle) {
           cancelAnimationFrame(autoScrollHandle);
           autoScrollHandle = null;
@@ -354,8 +371,20 @@
         } finally {
           cleanup();
         }
-      });
+      }
 
+      // A mousedown+mouseup pair on the same element also fires a trailing
+      // 'click' (e.g. a link navigating) — preventing default on mouseup
+      // alone does not stop that, so it's blocked here explicitly.
+      function onClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      document.addEventListener('mousedown', onMouseDown, true);
+      document.addEventListener('mousemove', onMouseMove, true);
+      document.addEventListener('mouseup', onMouseUp, true);
+      document.addEventListener('click', onClick, true);
       document.addEventListener('keydown', onKeyDown, true);
     }
 

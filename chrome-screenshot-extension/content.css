@@ -3,8 +3,15 @@
   inset: 0;
   z-index: 2147483647;
   background: rgba(15, 15, 20, 0.25);
-  cursor: crosshair;
   user-select: none;
+  /* Purely visual: the drag-to-select gesture is handled by listeners on
+     `document` instead, so this layer never intercepts wheel/scroll input
+     no matter how the browser hit-tests it. */
+  pointer-events: none;
+}
+
+html.zrzut-selecting {
+  cursor: crosshair !important;
 }
 
 .zrzut-hint {
