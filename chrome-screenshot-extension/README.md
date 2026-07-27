@@ -5,7 +5,7 @@ Wtyczka do Chrome robiąca zrzuty ekranu stron www — działa jak **GoFullPage*
 - **Zaznacz fragment** — przeciągnięciem myszy wybierasz dokładny obszar strony do zrzutu.
 - **Widoczny obszar** — szybki zrzut tego, co aktualnie widać w oknie przeglądarki.
 
-Po wykonaniu zrzutu otwiera się nowa karta z podglądem, opcją **Przytnij** (zaznacz obszar na już zrobionym zrzucie i przytnij do niego), przyciskiem **Pobierz PNG** oraz **Kopiuj do schowka**.
+Po wykonaniu zrzutu otwiera się nowa karta z podglądem, opcją **Przytnij** (zaznacz obszar na już zrobionym zrzucie i przytnij do niego), przyciskami **Pobierz PNG** / **Pobierz JPG** oraz **Kopiuj do schowka**.
 
 ## Instalacja (tryb dewelopera / rozszerzenie rozpakowane)
 

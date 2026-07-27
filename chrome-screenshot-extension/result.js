@@ -2,6 +2,7 @@ const mainEl = document.getElementById('main');
 const metaEl = document.getElementById('meta');
 const statusEl = document.getElementById('status');
 const btnDownload = document.getElementById('btn-download');
+const btnDownloadJpg = document.getElementById('btn-download-jpg');
 const btnCopy = document.getElementById('btn-copy');
 const btnCrop = document.getElementById('btn-crop');
 const btnCropApply = document.getElementById('btn-crop-apply');
@@ -239,6 +240,43 @@ btnDownload.addEventListener('click', () => {
       }
     }
   );
+});
+
+// JPEG has no transparency, so the source PNG is flattened onto a white
+// background first (otherwise transparent areas would turn black).
+function toJpegDataUrl(dataUrl, quality = 0.92) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
+}
+
+btnDownloadJpg.addEventListener('click', async () => {
+  if (!currentDataUrl) return;
+  try {
+    const jpegDataUrl = await toJpegDataUrl(currentDataUrl);
+    const jpgFilename = currentFilename.replace(/\.png$/i, '.jpg');
+    chrome.downloads.download({ url: jpegDataUrl, filename: jpgFilename, saveAs: false }, () => {
+      if (chrome.runtime.lastError) {
+        showStatus(`Błąd pobierania: ${chrome.runtime.lastError.message}`);
+      } else {
+        showStatus('Zapisano JPG.');
+      }
+    });
+  } catch (err) {
+    showStatus(`Nie udało się przekonwertować do JPG: ${err.message || err}`);
+  }
 });
 
 btnCopy.addEventListener('click', async () => {
